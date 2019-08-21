@@ -9,6 +9,7 @@ use App\Helper\Builder\RoutineActionBuilder;
 use App\Helper\Builder\RoutineBuilder;
 use App\Helper\Builder\RoutineConditionBuilder;
 use App\Helper\Factory\BuilderFactory;
+use App\Service\Routine\Schedule;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -21,12 +22,27 @@ use Symfony\Component\Routing\Annotation\Route;
 class RoutineController extends AbstractController
 {
     /**
+     * @var Schedule
+     */
+    protected $schedule;
+
+    /**
+     * RoutineController constructor.
+     * @param Schedule $schedule
+     */
+    public function __construct(Schedule $schedule)
+    {
+        $this->schedule = $schedule;
+    }
+
+    /**
      * @Route("/routine", name="routine_get", methods={"GET"})
      *
      * @return JsonResponse
      */
     public function getAll()
     {
+
         $em = $this->getDoctrine()->getManager();
         $routines = $em->getRepository(Routine::class)->findAll();
         $routineBuilder = BuilderFactory::create($em, RoutineBuilder::class);
@@ -144,6 +160,8 @@ class RoutineController extends AbstractController
 
         $em->persist($routine);
         $em->flush();
+
+        $this->schedule->scheduleRoutines();
 
         return new JsonResponse($routineBuilder->buildOutput($routine), $id ? 201 : 200, [
             'Access-Control-Allow-Origin' => '*'

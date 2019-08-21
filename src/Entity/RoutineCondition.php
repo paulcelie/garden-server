@@ -9,6 +9,9 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class RoutineCondition implements EntityInterface
 {
+    CONST TYPE_BUIENRADAR = 'br';
+    CONST TYPE_METEO      = 'mt';
+
     /**
      * @ORM\Id()
      * @ORM\GeneratedValue()

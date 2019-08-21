@@ -202,9 +202,9 @@ class HueController extends AbstractController
         $em->remove($bridge);
         $em->flush();
 
-        return new JsonResponse([], 200, [
-            'Access-Control-Allow-Origin' => '*'
-        ]);
+                return new JsonResponse([], 200, [
+                    'Access-Control-Allow-Origin' => '*'
+                ]);
     }
 
 }

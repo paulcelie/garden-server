@@ -11,6 +11,9 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class Routine implements EntityInterface
 {
+    const CONDITION_TYPE_OR = 'or';
+    const CONDITION_TYPE_AND = 'and';
+
     /**
      * @ORM\Id()
      * @ORM\GeneratedValue()
@@ -48,10 +51,16 @@ class Routine implements EntityInterface
      */
     private $routineActions;
 
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\RoutineLog", mappedBy="routine", orphanRemoval=true)
+     */
+    private $routineLogs;
+
     public function __construct()
     {
         $this->routineConditions = new ArrayCollection();
         $this->routineActions = new ArrayCollection();
+        $this->routineLogs = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -175,5 +184,36 @@ class Routine implements EntityInterface
 
     public function clearRoutineConditions() {
         $this->routineConditions = new ArrayCollection();
+    }
+
+    /**
+     * @return Collection|RoutineLog[]
+     */
+    public function getRoutineLogs(): Collection
+    {
+        return $this->routineLogs;
+    }
+
+    public function addRoutineLog(RoutineLog $routineLog): self
+    {
+        if (!$this->routineLogs->contains($routineLog)) {
+            $this->routineLogs[] = $routineLog;
+            $routineLog->setRoutine($this);
+        }
+
+        return $this;
+    }
+
+    public function removeRoutineLog(RoutineLog $routineLog): self
+    {
+        if ($this->routineLogs->contains($routineLog)) {
+            $this->routineLogs->removeElement($routineLog);
+            // set the owning side to null (unless already changed)
+            if ($routineLog->getRoutine() === $this) {
+                $routineLog->setRoutine(null);
+            }
+        }
+
+        return $this;
     }
 }
